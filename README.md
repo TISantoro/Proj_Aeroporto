@@ -26,16 +26,10 @@ Proj_Aeroporto/
 
 ## 🚀 Como Começar
 
-### 1. Instalar dependências
-```bash
-pip install -r requirements.txt
-```
-
-### 2. Rodar o servidor
+### 1. Rodar o servidor
 ```bash
 python run.py
 ```
-
 O servidor vai rodar em: http://localhost:8000
 
 ### 3. Acessar a documentação interativa
@@ -85,66 +79,3 @@ curl -X POST "http://localhost:8000/users/" \
   "updated_at": "2026-06-16T12:00:00"
 }
 ```
-
----
-
-## 🎯 Próximas Melhorias para Aprender
-
-### 1. **Hashear a senha** ⚠️ IMPORTANTE
-- [ ] Instalar `bcrypt` ou `passlib`
-- [ ] Implementar hash de senha antes de salvar
-- [ ] Criar função de validação de senha
-
-### 2. **Validações mais robustas**
-- [ ] Validar comprimento mínimo de senha
-- [ ] Validar formato de email mais rigoroso
-- [ ] Adicionar validação de CPF (se necessário)
-
-### 3. **Testes automatizados**
-- [ ] Criar testes unitários com `pytest`
-- [ ] Testar casos de sucesso e erro
-
-### 4. **Autenticação**
-- [ ] Implementar JWT para login
-- [ ] Criar endpoint de login
-
----
-
-## 📚 Conceitos para Entender
-
-### 1. **Models (SQLAlchemy)**
-- Classe que representa a tabela no banco de dados
-- Define a estrutura dos dados (colunas, tipos, relacionamentos)
-
-### 2. **Schemas (Pydantic)**
-- Valida e serializa dados da API
-- Transforma dados Python em JSON
-
-### 3. **Routers (FastAPI)**
-- Agrupa endpoints relacionados
-- Define o comportamento dos endpoints
-
-### 4. **Database Session**
-- `get_db()` injeta a sessão do banco automaticamente
-- Garante que a conexão seja fechada
-
----
-
-## 💡 Dicas de Desenvolvimento
-
-1. **Use o Swagger UI** para testar a API enquanto desenvolve
-2. **Leia os erros** - FastAPI dá mensagens muito claras
-3. **Incremente gradualmente** - faça uma coisa por vez
-4. **Commite frequentemente** - bom para histórico
-
----
-
-## 🔗 Recursos Úteis
-
-- [FastAPI Docs](https://fastapi.tiangolo.com/)
-- [SQLAlchemy Docs](https://docs.sqlalchemy.org/)
-- [Pydantic Docs](https://docs.pydantic.dev/)
-
----
-
-**Pronto para começar? Rode `python run.py` e acesse http://localhost:8000/docs!** 🎉

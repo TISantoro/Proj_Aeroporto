@@ -23,22 +23,13 @@ Proj_Aeroporto/
 ├── run.py                      # Script para rodar o servidor
 └── requirements.txt            # Dependências do projeto
 ```
-
-## 🚀 Como Começar
-
-### 1. Rodar o servidor
-```bash
-python run.py
-```
-O servidor vai rodar em: http://localhost:8000
-
-### 3. Acessar a documentação interativa
+### Acessar a documentação interativa
 - **Swagger UI**: http://localhost:8000/docs
 - **ReDoc**: http://localhost:8000/redoc
 
 ---
 
-## 📝 US-01: Cadastrar Usuário
+## US-01: Cadastrar Usuário
 
 ### O que foi implementado:
 

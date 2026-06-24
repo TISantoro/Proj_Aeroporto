@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 from app.database.db import get_db
 from app.models.user import User
@@ -55,6 +55,51 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
             detail="Usuário não encontrado"
         )
     return user
+
+
+@router.put("/{user_id}", response_model=UserResponse)
+def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):
+    """Atualiza os dados de um usuário existente"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado"
+        )
+
+    if user_update.email:
+        existing_email = db.query(User).filter(User.email == user_update.email, User.id != user_id).first()
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email já cadastrado"
+            )
+        user.email = user_update.email
+
+    if user_update.name:
+        user.name = user_update.name
+
+    if user_update.password:
+        user.password = user_update.password  # TODO: Hash a senha antes de salvar!
+
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_user(user_id: int, db: Session = Depends(get_db)):
+    """Remove um usuário do sistema (soft delete)"""
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuário não encontrado"
+        )
+
+    user.active = False
+    db.commit()
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
 @router.get("/", response_model=list[UserResponse])

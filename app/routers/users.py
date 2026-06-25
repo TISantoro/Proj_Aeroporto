@@ -1,109 +1,46 @@
-from fastapi import APIRouter, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 from app.database.db import get_db
-from app.models.user import User
+from app.services.user import UserService
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
+def get_user_service(db: Session = Depends(get_db)) -> UserService:
+    """Dependência para injetar o serviço de usuários"""
+    return UserService(db)
+
+
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    """
-    US-01: Cadastrar usuário
-    
-    Cria um novo usuário no sistema com os dados fornecidos.
-    """
-    # Verifica se o email já existe
-    existing_email = db.query(User).filter(User.email == user.email).first()
-    if existing_email:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email já cadastrado"
-        )
-    
-    # Verifica se o login já existe
-    existing_login = db.query(User).filter(User.login == user.login).first()
-    if existing_login:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Login já cadastrado"
-        )
-    
-    # Cria o novo usuário
-    db_user = User(
-        name=user.name,
-        email=user.email,
-        login=user.login,
-        password=user.password  # TODO: Hash a senha antes de salvar!
-    )
-    
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    
-    return db_user
+def create_user(user: UserCreate, service: UserService = Depends(get_user_service)):
+    """Cria um novo usuário no sistema com os dados fornecidos."""
+    return service.create_user(user)
 
 
 @router.get("/{user_id}", response_model=UserResponse)
-def get_user(user_id: int, db: Session = Depends(get_db)):
+def get_user(user_id: int, service: UserService = Depends(get_user_service)):
     """Retorna os dados de um usuário específico"""
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado"
-        )
-    return user
+    return service.get_user_by_id(user_id)
 
 
 @router.put("/{user_id}", response_model=UserResponse)
-def update_user(user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)):
+def update_user(
+    user_id: int,
+    user_update: UserUpdate,
+    service: UserService = Depends(get_user_service)
+):
     """Atualiza os dados de um usuário existente"""
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado"
-        )
-
-    if user_update.email:
-        existing_email = db.query(User).filter(User.email == user_update.email, User.id != user_id).first()
-        if existing_email:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Email já cadastrado"
-            )
-        user.email = user_update.email
-
-    if user_update.name:
-        user.name = user_update.name
-
-    if user_update.password:
-        user.password = user_update.password  # TODO: Hash a senha antes de salvar!
-
-    db.commit()
-    db.refresh(user)
-    return user
+    return service.update_user(user_id, user_update)
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int, db: Session = Depends(get_db)):
+def delete_user(user_id: int, service: UserService = Depends(get_user_service)):
     """Remove um usuário do sistema (soft delete)"""
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Usuário não encontrado"
-        )
-
-    user.active = False
-    db.commit()
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+    service.delete_user(user_id)
 
 
 @router.get("/", response_model=list[UserResponse])
-def list_users(db: Session = Depends(get_db)):
-    """US-02: Listar usuários"""
-    users = db.query(User).filter(User.active == True).all()
-    return users
+def list_users(service: UserService = Depends(get_user_service)):
+    """Retorna a lista de todos os usuários"""
+    return service.list_all_users()

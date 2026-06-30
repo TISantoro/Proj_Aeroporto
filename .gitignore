@@ -1,0 +1,31 @@
+# Bytecode Python
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Testes
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Lint e type check
+.mypy_cache/
+.ruff_cache/
+
+# IDEs
+.vscode/
+.idea/
+
+# Variáveis de ambiente
+.env
+
+# Logs
+*.log
+
+# Sistema operacional
+.DS_Store
+Thumbs.db

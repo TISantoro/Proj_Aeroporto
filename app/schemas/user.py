@@ -11,6 +11,18 @@ class UserCreate(BaseModel):
     password: str
 
 
+class LoginRequest(BaseModel):
+    """Schema para autenticação de usuário"""
+    login: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    """Schema para resposta do login"""
+    access_token: str
+    token_type: str = "bearer"
+
+
 class UserUpdate(BaseModel):
     """Schema para atualizar um usuário"""
     name: Optional[str] = None

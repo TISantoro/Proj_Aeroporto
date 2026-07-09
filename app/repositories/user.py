@@ -36,6 +36,14 @@ class UserRepository:
         """Retorna todos os usuários"""
         return self.db.query(User).all()
 
+    def has_any_user(self) -> bool:
+        """Retorna True se existe ao menos um usuário cadastrado."""
+        return self.db.query(User).first() is not None
+
+    def has_active_user(self) -> bool:
+        """Retorna True se existe ao menos um usuário ativo."""
+        return self.has_any_user()
+
     def update(self, user: User) -> User:
         """Atualiza um usuário existente"""
         self.db.commit()

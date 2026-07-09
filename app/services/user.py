@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
+from app.auth.security import hash_password
 from app.models.user import User
 from app.repositories.user import UserRepository
 from app.schemas.user import UserCreate, UserUpdate
@@ -9,6 +10,10 @@ class UserService:
  
     def __init__(self, db: Session):
         self.repository = UserRepository(db)
+
+    def can_register_without_auth(self) -> bool:
+        """Permite cadastro inicial sem autenticação apenas se não existir usuário cadastrado."""
+        return not self.repository.has_any_user()
 
     def create_user(self, user_data: UserCreate) -> User:
         # Validação: Email já cadastrado
@@ -30,7 +35,7 @@ class UserService:
             name=user_data.name,
             email=user_data.email,
             login=user_data.login,
-            password=user_data.password
+            password=hash_password(user_data.password)
         )
 
         return self.repository.create(db_user)
@@ -60,13 +65,17 @@ class UserService:
             user.name = user_update.name
 
         if user_update.password:
-            user.password = user_update.password  # TODO: Hash da senha aqui!
+            user.password = hash_password(user_update.password)
 
         return self.repository.update(user)
 
     def delete_user(self, user_id: int) -> None:
         user = self.get_user_by_id(user_id)
         self.repository.delete(user)
+
+    def hard_delete_user(self, user_id: int) -> None:
+        user = self.get_user_by_id(user_id)
+        self.repository.hard_delete(user)
 
     def list_all_users(self) -> list[User]:
         return self.repository.get_all()

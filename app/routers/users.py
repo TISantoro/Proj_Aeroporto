@@ -1,5 +1,6 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from app.auth.dependencies import get_current_user, get_current_user_optional
 from app.database.db import get_db
 from app.services.user import UserService
 from app.schemas.user import UserCreate, UserResponse, UserUpdate
@@ -13,8 +14,17 @@ def get_user_service(db: Session = Depends(get_db)) -> UserService:
 
 
 @router.post("/", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-def create_user(user: UserCreate, service: UserService = Depends(get_user_service)):
+def create_user(
+    user: UserCreate,
+    service: UserService = Depends(get_user_service),
+    current_user=Depends(get_current_user_optional),
+):
     """Cria um novo usuário no sistema com os dados fornecidos."""
+    if not service.can_register_without_auth() and current_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Autenticação necessária para cadastrar novos usuários",
+        )
     return service.create_user(user)
 
 
@@ -35,9 +45,23 @@ def update_user(
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_user(user_id: int, service: UserService = Depends(get_user_service)):
+def delete_user(
+    user_id: int,
+    service: UserService = Depends(get_user_service),
+    current_user=Depends(get_current_user),
+):
     """Remove um usuário do sistema (soft delete)"""
     service.delete_user(user_id)
+
+
+@router.delete("/{user_id}/hard", status_code=status.HTTP_204_NO_CONTENT)
+def hard_delete_user(
+    user_id: int,
+    service: UserService = Depends(get_user_service),
+    current_user=Depends(get_current_user),
+):
+    """Remove permanentemente um usuário do sistema."""
+    service.hard_delete_user(user_id)
 
 
 @router.get("/", response_model=list[UserResponse])

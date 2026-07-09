@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional
 from datetime import datetime
 
@@ -11,6 +11,18 @@ class UserCreate(BaseModel):
     password: str
 
 
+class LoginRequest(BaseModel):
+    """Schema para autenticação de usuário"""
+    login: str
+    password: str
+
+
+class TokenResponse(BaseModel):
+    """Schema para resposta do login"""
+    access_token: str
+    token_type: str = "bearer"
+
+
 class UserUpdate(BaseModel):
     """Schema para atualizar um usuário"""
     name: Optional[str] = None
@@ -20,6 +32,8 @@ class UserUpdate(BaseModel):
 
 class UserResponse(BaseModel):
     """Schema para retornar dados de um usuário"""
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     name: str
     email: str
@@ -27,6 +41,4 @@ class UserResponse(BaseModel):
     active: bool
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
+    

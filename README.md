@@ -1,72 +1,172 @@
 # Sistema de Controle de Pousos e Decolagens
 
-## 📁 Estrutura do Projeto
+API REST desenvolvida com FastAPI para gerenciamento de pousos e decolagens em um aeroporto, com foco em aprendizado, mentoria e boas práticas no desenvolvimento de APIs.
 
-```
-Proj_Aeroporto/
-├── app/
-│   ├── __init__.py
-│   ├── main.py                 # App FastAPI principal
-│   ├── database/
-│   │   ├── __init__.py
-│   │   └── db.py              # Configuração do banco de dados
-│   ├── models/
-│   │   ├── __init__.py
-│   │   └── user.py            # Modelo de Usuário (ORM)
-│   ├── schemas/
-│   │   ├── __init__.py
-│   │   └── user.py            # Schemas de validação (Pydantic)
-│   └── routers/
-│       ├── __init__.py
-│       └── users.py           # Endpoints da API de usuários
-├── main.py                     # Ponto de entrada
-├── run.py                      # Script para rodar o servidor
-└── requirements.txt            # Dependências do projeto
-```
-### Acessar a documentação interativa
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
+Este projeto é uma base para estudo de:
+- arquitetura em camadas
+- autenticação com JWT
+- hash de senhas com bcrypt
+- testes automatizados
+- organização de rotas, serviços, schemas e repositórios
 
----
+## Tecnologias
 
-## US-01: Cadastrar Usuário
+- Python 3.13+
+- FastAPI
+- SQLAlchemy
+- SQLite
+- Pydantic
+- JWT (PyJWT)
+- bcrypt
+- Pytest
 
-### O que foi implementado:
+## Funcionalidades implementadas
 
-**Endpoint:** `POST /users/`
+- CRUD de usuários
+- Login com JWT
+- Hash de senha com bcrypt
+- Proteção de rotas autenticadas
+- Cadastro do primeiro usuário sem autenticação
+- Testes automatizados para o fluxo de usuários
 
-**Campos do cadastro:**
-- `name` (string) - Nome do usuário
-- `email` (string) - Email único
-- `login` (string) - Login único
-- `password` (string) - Senha
+## Funcionalidades em desenvolvimento
 
-**Validações:**
-- Email e login devem ser únicos
-- Email deve ser válido
-- Todos os campos são obrigatórios
+- CRUD de aeronaves
+- CRUD de pistas
+- Operações de pouso e decolagem
+- Auditoria
+- Relatórios
 
-**Exemplo de requisição (via Swagger UI ou curl):**
+## Pré-requisitos
+
+- Python 3.10 ou superior
+- pip
+- virtualenv (opcional, mas recomendado)
+
+## Instalação
+
+Clone o repositório:
+
 ```bash
-curl -X POST "http://localhost:8000/users/" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "João Silva",
-    "email": "joao@example.com",
-    "login": "joao_silva",
-    "password": "senha123"
-  }'
+git clone https://github.com/TISantoro/Proj_Aeroporto.git
+cd Proj_Aeroporto
 ```
 
-**Resposta esperada:**
+Crie e ative um ambiente virtual:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+No Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+```
+
+Instale as dependências:
+
+```bash
+pip install -r requirements.txt
+```
+
+## Execução
+
+Inicie a aplicação:
+
+```bash
+python run.py
+```
+
+Ou com uvicorn:
+
+```bash
+python -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+A documentação Swagger ficará disponível em:
+
+- http://127.0.0.1:8000/docs
+
+## Como usar a API
+
+### 1. Criar o primeiro usuário
+
+Endpoint:
+
+```http
+POST /users/
+```
+
+Body:
+
 ```json
 {
-  "id": 1,
-  "name": "João Silva",
-  "email": "joao@example.com",
-  "login": "joao_silva",
-  "active": true,
-  "created_at": "2026-06-16T12:00:00",
-  "updated_at": "2026-06-16T12:00:00"
+  "name": "Admin",
+  "email": "admin@email.com",
+  "login": "admin",
+  "password": "123456"
 }
 ```
+
+### 2. Fazer login
+
+Endpoint:
+
+```http
+POST /auth/login
+```
+
+Body:
+
+```json
+{
+  "login": "admin",
+  "password": "123456"
+}
+```
+
+Resposta:
+
+```json
+{
+  "access_token": "<token_jwt>",
+  "token_type": "bearer"
+}
+```
+
+### 3. Usar o token nas rotas protegidas
+
+No header da requisição:
+
+```http
+Authorization: Bearer <token_jwt>
+```
+
+## Estrutura do projeto
+
+```text
+app/
+├── auth/               # JWT, hash de senha e dependências de autenticação
+├── database/           # configuração do banco e sessão
+├── models/             # modelos SQLAlchemy
+├── repositories/       # acesso ao banco
+├── routers/            # endpoints da API
+├── schemas/            # modelos de entrada/saída com Pydantic
+├── services/           # regras de negócio
+```
+
+## Testes
+
+Execute os testes com:
+
+```bash
+pytest -q
+```
+
+## Fluxo de autenticação
+
+- O primeiro usuário pode ser criado sem token. Isso permite inicializar o sistema quando ainda não existe nenhum usuário cadastrado
+- Após existir pelo menos um usuário cadastrado, as rotas de criação e demais operações protegidas exigem autenticação via JWT.

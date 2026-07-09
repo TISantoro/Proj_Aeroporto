@@ -30,7 +30,7 @@ class UserService:
                 detail="Login já cadastrado"
             )
 
-        # Criar usuário (TODO: Hash da senha aqui seria ideal!)
+        # Criar usuário
         db_user = User(
             name=user_data.name,
             email=user_data.email,

@@ -28,11 +28,10 @@ Este projeto é uma base para estudo de:
 - Proteção de rotas autenticadas
 - Cadastro do primeiro usuário sem autenticação
 - Testes automatizados para o fluxo de usuários
+ - CRUD de aeronaves
+ - CRUD de pistas
 
 ## Funcionalidades em desenvolvimento
-
-- CRUD de aeronaves
-- CRUD de pistas
 - Operações de pouso e decolagem
 - Auditoria
 - Relatórios

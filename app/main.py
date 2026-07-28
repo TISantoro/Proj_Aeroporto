@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from app.auth import router as auth_router
 from app.database.db import engine, Base
 from app.routers import users, aircrafts
+from app.routers import runways
 
 # Cria as tabelas no banco de dados
 Base.metadata.create_all(bind=engine)
@@ -16,6 +17,7 @@ app = FastAPI(
 app.include_router(auth_router.router)
 app.include_router(users.router)
 app.include_router(aircrafts.router)
+app.include_router(runways.router)
 
 
 @app.get("/")

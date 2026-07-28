@@ -11,9 +11,7 @@ class AircraftService:
         self.repository = AircraftRepository(db)
 
     def create_aircraft(self, aircraft_data: AircraftCreate) -> Aircraft:
-        """US-04: Cadastra um novo avião com validações
-        
-        Validações:
+        """Validações:
         - Identificador é obrigatório (já garantido pelo schema)
         - Identificador deve ser único
         - Modelo é obrigatório (já garantido pelo schema)
@@ -54,18 +52,14 @@ class AircraftService:
         active_only: bool = True, 
         identifier_filter: str | None = None
     ) -> list[Aircraft]:
-        """US-05: Lista aviões cadastrados
-        
-        Filtros:
+        """Filtros:
         - active_only: Se True, exibe apenas aviões ativos (padrão)
         - identifier_filter: Permite busca pelo identificador
         """
         return self.repository.get_all(active_only=active_only, identifier_filter=identifier_filter)
 
     def update_aircraft(self, aircraft_id: int, aircraft_update: AircraftUpdate) -> Aircraft:
-        """US-07: Atualiza dados de um avião
-        
-        Validações:
+        """Validações:
         - Não permite alteração do identificador único
         - Permite alteração de modelo, companhia aérea e capacidade
         - TODO: Validar se avião está em operação
@@ -96,9 +90,7 @@ class AircraftService:
         return self.repository.update(aircraft)
 
     def deactivate_aircraft(self, aircraft_id: int) -> Aircraft:
-        """US-08: Inativa um avião
-        
-        Validações:
+        """Validações:
         - Não permitir inativação se o avião estiver em operação
         - TODO: Validar se avião está em operação
         """
